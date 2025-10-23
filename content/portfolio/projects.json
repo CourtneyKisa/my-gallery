@@ -1,0 +1,12 @@
+[
+  {
+    "slug": "hello-world",
+    "title": "Hello World Project",
+    "description": "A small demo project to showcase the portfolio grid.",
+    "year": 2025,
+    "tags": ["demo", "nextjs"],
+    "url": "https://example.com",
+    "github": "https://github.com/yourname/hello-world",
+    "image": "/portfolio/hello-world/cover.jpg"
+  }
+]

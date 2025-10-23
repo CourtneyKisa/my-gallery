@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export type PostMeta = {
   slug: string;
@@ -13,15 +14,23 @@ export type PostMeta = {
 export default function BlogSearch({
   items,
   pageSize = 10,
+  initialQ = '',
+  initialTag = null,
+  initialPage = 1,
 }: {
   items: PostMeta[];
   pageSize?: number;
+  initialQ?: string;
+  initialTag?: string | null;
+  initialPage?: number;
 }) {
-  const [q, setQ] = useState('');
-  const [page, setPage] = useState(1);
-  const [tag, setTag] = useState<string | null>(null);
+  const router = useRouter();
 
-  // all unique tags for chips
+  const [q, setQ] = useState(initialQ);
+  const [tag, setTag] = useState<string | null>(initialTag);
+  const [page, setPage] = useState(Math.max(1, Number(initialPage) || 1));
+
+  // all unique tags
   const allTags = useMemo(() => {
     const s = new Set<string>();
     for (const p of items) (p.tags || []).forEach((t) => s.add(String(t)));
@@ -32,10 +41,7 @@ export default function BlogSearch({
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return items.filter((p) => {
-      // tag filter
       if (tag && !(p.tags || []).includes(tag)) return false;
-
-      // text filter
       if (!needle) return true;
       const inTitle = p.title?.toLowerCase().includes(needle);
       const inExcerpt = p.excerpt?.toLowerCase().includes(needle);
@@ -44,6 +50,17 @@ export default function BlogSearch({
     });
   }, [items, q, tag]);
 
+  // sync URL (?q=&tag=&page=) for shareable filters
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (q.trim()) params.set('q', q.trim());
+    if (tag) params.set('tag', tag);
+    if (page > 1) params.set('page', String(page));
+    const qs = params.toString();
+    router.replace(`/blog${qs ? `?${qs}` : ''}`, { scroll: false });
+  }, [q, tag, page, router]);
+
+  // paging
   const totalPages = Math.max(Math.ceil(filtered.length / pageSize), 1);
   const safePage = Math.min(page, totalPages);
   const start = (safePage - 1) * pageSize;
@@ -68,7 +85,7 @@ export default function BlogSearch({
           value={q}
           onChange={(e) => {
             setQ(e.target.value);
-            setPage(1); // reset page on new query
+            setPage(1);
           }}
           placeholder="Search posts by title, excerpt, or tag…"
           className="w-full max-w-xl rounded-md border px-3 py-2 text-sm bg-white/70 dark:bg-black/40"
@@ -130,7 +147,7 @@ export default function BlogSearch({
         </ul>
       )}
 
-      {/* pager */}
+      {/* Pager */}
       <div className="mt-8 flex items-center justify-between">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
