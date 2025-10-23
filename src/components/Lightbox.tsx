@@ -7,7 +7,7 @@ export default function LightboxImages({ selector = 'article img' }: { selector?
   const [index, setIndex] = useState<number>(-1);
   const [imgs, setImgs] = useState<HTMLImageElement[]>([]);
 
-  // collect images on mount
+  // Collect images and attach click handlers
   useEffect(() => {
     const found = Array.from(document.querySelectorAll<HTMLImageElement>(selector));
     found.forEach((img) => (img.style.cursor = 'zoom-in'));
@@ -26,10 +26,16 @@ export default function LightboxImages({ selector = 'article img' }: { selector?
   }, [selector]);
 
   const total = imgs.length;
-  const src = useMemo(() => (index >= 0 && index < total ? imgs[index].currentSrc || imgs[index].src : null), [imgs, index, total]);
-  const alt = useMemo(() => (index >= 0 && index < total ? imgs[index].alt || '' : ''), [imgs, index, total]);
+  const src = useMemo(
+    () => (index >= 0 && index < total ? imgs[index].currentSrc || imgs[index].src : null),
+    [imgs, index, total]
+  );
+  const alt = useMemo(
+    () => (index >= 0 && index < total ? imgs[index].alt || '' : ''),
+    [imgs, index, total]
+  );
 
-  // keyboard: Esc / Left / Right
+  // Keyboard controls
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -60,16 +66,14 @@ export default function LightboxImages({ selector = 'article img' }: { selector?
           className="max-h-[86vh] w-auto h-auto rounded-lg shadow-2xl"
           draggable={false}
         />
-        {alt ? (
-          <p className="text-center text-sm text-neutral-300 mt-2">{alt}</p>
-        ) : null}
+        {alt ? <p className="text-center text-sm text-neutral-300 mt-2">{alt}</p> : null}
 
         {/* Counter */}
         <div className="absolute left-1/2 -translate-x-1/2 -top-8 text-xs text-neutral-300">
           {index + 1} / {total}
         </div>
 
-        {/* Controls */}
+        {/* Close */}
         <button
           onClick={() => setOpen(false)}
           className="absolute top-0 right-0 -mt-3 -mr-3 rounded-full border px-3 py-1 text-sm bg-black/40 hover:bg-black/60"
@@ -78,6 +82,7 @@ export default function LightboxImages({ selector = 'article img' }: { selector?
           Close
         </button>
 
+        {/* Prev / Next */}
         {total > 1 && (
           <>
             <button
@@ -90,5 +95,13 @@ export default function LightboxImages({ selector = 'article img' }: { selector?
             <button
               onClick={goNext}
               aria-label="Next image"
-              className="absolute right-0 top-1/
-
+              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 rounded-full border px-3 py-1 text-sm bg-black/40 hover:bg-black/60"
+            >
+              →
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
