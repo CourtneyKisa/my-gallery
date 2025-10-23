@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "og:all": "python3 scripts/gen_og.py --all",
+    "og:slug": "python3 scripts/gen_og.py --slug"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
