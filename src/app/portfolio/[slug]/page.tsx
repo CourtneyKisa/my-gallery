@@ -1,82 +1,70 @@
-
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getAllProjectSlugs, getProjectBySlug } from '../../../lib/portfolio';
-
-export const revalidate = 60;
-
-// derive site base for OG/Canonical (same pattern used elsewhere)
-function getSiteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
-}
+import GalleryLightbox from '@/components/GalleryLightbox';
+import { getProjectBySlug, getAllProjects } from '@/lib/projects';
 
 export async function generateStaticParams() {
-  return getAllProjectSlugs().map((slug) => ({ slug }));
+  const projects = await getAllProjects();
+  return projects.map((p: { slug: string }) => ({ slug: p.slug }));
 }
 
-type ParamsP = Promise<{ slug: string }>;
-type Props = { params: ParamsP };
-
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = getProjectBySlug(slug);
-  if (!p) return {};
-  const site = getSiteUrl();
-  const url = `${site}/portfolio/${encodeURIComponent(slug)}`;
+  const project = await getProjectBySlug(slug);
+  if (!project) return {};
   return {
-    title: `${p.title} | Portfolio`,
-    description: p.description || undefined,
-    alternates: { canonical: url },
+    title: `${project.title} — Portfolio`,
     openGraph: {
-      type: 'website',
-      url,
-      title: p.title,
-      description: p.description || undefined,
-      images: p.image ? [{ url: p.image, width: 1200, height: 630, alt: p.title }] : undefined,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: p.title,
-      description: p.description || undefined,
-      images: p.image ? [p.image] : undefined,
+      title: project.title,
+      images: (project.images || []).slice(0, 1).map((img: any) =>
+        typeof img === 'string' ? img : img.src
+      ),
     },
   };
 }
 
-export default async function ProjectPage({ params }: Props) {
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = getProjectBySlug(slug);
-  if (!p) return notFound();
+  const project = await getProjectBySlug(slug);
+  if (!project) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <article className="prose prose-neutral dark:prose-invert max-w-none">
-        <h1>{p.title}</h1>
-        {p.year ? <p className="not-prose text-sm text-neutral-500">{p.year}</p> : null}
-        {p.tags?.length ? (
-          <p className="not-prose mt-2 text-xs text-neutral-500">#{p.tags.join(' #')}</p>
-        ) : null}
-        {p.image ? <img src={p.image} alt={p.title} className="rounded-lg shadow mt-4" /> : null}
-        {p.description ? <p className="mt-4">{p.description}</p> : null}
-        <div className="not-prose mt-4 flex gap-4 text-sm">
-          {p.url ? (
-            <a className="underline underline-offset-4" href={p.url} target="_blank" rel="noreferrer">
-              Live ↗
-            </a>
-          ) : null}
-          {p.github ? (
-            <a className="underline underline-offset-4" href={p.github} target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-          ) : null}
-        </div>
-        {p.images?.length ? (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {p.images.map((src, i) => (
-              <img key={i} src={src} alt={`${p.title} ${i + 1}`} className="rounded-md" />
+    <main className="mx-auto max-w-5xl px-4 py-10">
+      <header className="mb-6">
+        <h1 className="text-3xl font-semibold tracking-tight">{project.title}</h1>
+        {project.tags?.length ? (
+          <ul className="mt-2 flex flex-wrap gap-2 text-sm text-zinc-600">
+            {project.tags.map((t: string) => (
+              <li key={t} className="rounded-full bg-zinc-100 px-2 py-0.5">{t}</li>
             ))}
-          </div>
+          </ul>
         ) : null}
-      </article>
+      </header>
+
+      {project.description ? (
+        <p className="mb-6 text-zinc-700 leading-relaxed">{project.description}</p>
+      ) : null}
+
+      {Array.isArray(project.images) && project.images.length > 0 ? (
+        <GalleryLightbox images={project.images} />
+      ) : (
+        <div className="rounded-xl border border-dashed p-8 text-center text-zinc-500">
+          No images for this project yet.
+        </div>
+      )}
+
+      {project.cover && (
+        <div className="mt-10">
+          <Image
+            src={typeof project.cover === 'string' ? project.cover : project.cover.src}
+            alt={project.title}
+            width={1600}
+            height={900}
+            className="w-full rounded-2xl"
+            priority
+          />
+        </div>
+      )}
     </main>
   );
 }

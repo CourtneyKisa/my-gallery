@@ -1,0 +1,36 @@
+[
+  {
+    "slug": "sample-project",
+    "title": "Sample Project",
+    "excerpt": "A minimal example project to verify the pages compile.",
+    "cover": "/og-image.png",
+    "tags": [
+      "demo",
+      "nextjs"
+    ],
+    "description": "Replace this with your real project data.",
+    "images": [
+      {
+        "src": "/og-image.png",
+        "alt": "Sample image",
+        "width": 1200,
+        "height": 630
+      }
+    ]
+  },
+  {
+    "slug": "my-shoot-001",
+    "title": "My Shoot 001",
+    "excerpt": "Fashion lookbook",
+    "cover": "/images/shoot-001/cover.png",
+    "tags": [
+      "fashion",
+      "studio"
+    ],
+    "description": "Behind the scenes + selects.",
+    "images": [
+      "/images/shoot-001/1.png",
+      "/og-image.png"
+    ]
+  }
+]

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import SiteHeader from '@/components/SiteHeader';
 import '../app/globals.css';
 import Navbar from '../components/Navbar';
 import { getSiteUrl } from '../lib/site';
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
-  <SiteHeader />
         <Navbar />
         {children}
       </body>
