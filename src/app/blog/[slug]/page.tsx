@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getAllSlugs, getPostBySlug } from '../../../lib/posts';
 import { getSiteUrl } from '../../../lib/site';
+import { resolveOgImage } from '../../../lib/og';
 import { remark } from 'remark';
 import html from 'remark-html';
 
@@ -20,6 +21,8 @@ export async function generateMetadata({ params }: Props) {
   if (!post) return {};
   const site = getSiteUrl();
   const url = `${site}/blog/${encodeURIComponent(slug)}`;
+  const og = resolveOgImage(slug, post); // <-- pick best image
+
   return {
     title: post.title,
     description: post.excerpt || undefined,
@@ -30,13 +33,13 @@ export async function generateMetadata({ params }: Props) {
       title: post.title,
       description: post.excerpt || undefined,
       publishedTime: new Date(post.date).toISOString(),
-      images: [{ url: '/og.png', width: 1200, height: 630, alt: post.title }],
+      images: [{ url: og, width: 1200, height: 630, alt: post.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt || undefined,
-      images: ['/og.png'],
+      images: [og],
     },
   };
 }
@@ -50,7 +53,6 @@ export default async function BlogPostPage({ params }: Props) {
   const contentHtml = processed.toString();
   const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(post.date));
 
-  // JSON-LD Article schema
   const site = getSiteUrl();
   const url = `${site}/blog/${encodeURIComponent(slug)}`;
   const jsonLd = {

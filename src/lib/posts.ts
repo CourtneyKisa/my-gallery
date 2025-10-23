@@ -10,6 +10,8 @@ export type PostMeta = {
   tags?: string[];
   slug: string;
   draft?: boolean;
+  ogImage?: string; // optional front-matter
+  image?: string;   // alias
 };
 
 export type Post = PostMeta & { content: string };
@@ -40,18 +42,16 @@ function readOne(slug: string): Post | null {
     tags: Array.isArray(data.tags) ? data.tags : [],
     slug,
     draft: Boolean(data.draft ?? false),
+    ogImage: typeof data.ogImage === 'string' ? data.ogImage : undefined,
+    image: typeof data.image === 'string' ? data.image : undefined,
   };
 
   return { ...meta, content };
 }
 
 export function getAllPostsMeta(includeDrafts = process.env.NODE_ENV !== 'production'): PostMeta[] {
-  const items = getSlugs()
-    .map((s) => readOne(s))
-    .filter(Boolean) as Post[];
-
+  const items = getSlugs().map((s) => readOne(s)).filter(Boolean) as Post[];
   const filtered = items.filter((p) => includeDrafts || !p.draft);
-
   return filtered
     .map((p) => ({
       title: p.title,
@@ -60,6 +60,8 @@ export function getAllPostsMeta(includeDrafts = process.env.NODE_ENV !== 'produc
       tags: p.tags,
       slug: p.slug,
       draft: p.draft,
+      ogImage: p.ogImage,
+      image: p.image,
     }))
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
