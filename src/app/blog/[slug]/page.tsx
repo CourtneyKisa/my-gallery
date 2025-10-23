@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getAllSlugs, getPostBySlug } from '../../../lib/posts';
+import { getSiteUrl } from '../../../lib/site';
 import { remark } from 'remark';
 import html from 'remark-html';
 
@@ -9,6 +10,7 @@ export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
 
+// Next 16: params is a Promise
 type ParamsP = Promise<{ slug: string }>;
 type Props = { params: ParamsP };
 
@@ -16,7 +18,27 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return {};
-  return { title: post.title, description: post.excerpt || undefined };
+  const site = getSiteUrl();
+  const url = `${site}/blog/${encodeURIComponent(slug)}`;
+  return {
+    title: post.title,
+    description: post.excerpt || undefined,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      url,
+      title: post.title,
+      description: post.excerpt || undefined,
+      publishedTime: new Date(post.date).toISOString(),
+      images: [{ url: '/og.png', width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: ['/og.png'],
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -28,12 +50,27 @@ export default async function BlogPostPage({ params }: Props) {
   const contentHtml = processed.toString();
   const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(post.date));
 
+  // JSON-LD Article schema
+  const site = getSiteUrl();
+  const url = `${site}/blog/${encodeURIComponent(slug)}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    datePublished: new Date(post.date).toISOString(),
+    dateModified: new Date(post.date).toISOString(),
+    url,
+    mainEntityOfPage: url,
+    author: { '@type': 'Person', name: 'Courtney Kisa' }
+  };
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <article className="prose prose-neutral dark:prose-invert max-w-none">
         <h1>{post.title}</h1>
         <p className="not-prose text-sm text-neutral-500">{date}</p>
         <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </article>
     </main>
   );
