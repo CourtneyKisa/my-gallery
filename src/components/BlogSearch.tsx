@@ -19,17 +19,30 @@ export default function BlogSearch({
 }) {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
+  const [tag, setTag] = useState<string | null>(null);
 
+  // all unique tags for chips
+  const allTags = useMemo(() => {
+    const s = new Set<string>();
+    for (const p of items) (p.tags || []).forEach((t) => s.add(String(t)));
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [items]);
+
+  // filter by query + tag
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return items;
     return items.filter((p) => {
+      // tag filter
+      if (tag && !(p.tags || []).includes(tag)) return false;
+
+      // text filter
+      if (!needle) return true;
       const inTitle = p.title?.toLowerCase().includes(needle);
       const inExcerpt = p.excerpt?.toLowerCase().includes(needle);
       const inTags = (p.tags || []).join(' ').toLowerCase().includes(needle);
       return inTitle || inExcerpt || inTags;
     });
-  }, [items, q]);
+  }, [items, q, tag]);
 
   const totalPages = Math.max(Math.ceil(filtered.length / pageSize), 1);
   const safePage = Math.min(page, totalPages);
@@ -44,9 +57,13 @@ export default function BlogSearch({
     }
   }
 
+  const tagBtn =
+    'rounded-full border px-3 py-1 text-xs hover:bg-black/5 dark:hover:bg-white/10 transition';
+
   return (
     <div>
-      <div className="mb-6">
+      {/* Search */}
+      <div className="mb-3">
         <input
           value={q}
           onChange={(e) => {
@@ -59,10 +76,39 @@ export default function BlogSearch({
         />
         <p className="mt-2 text-xs text-neutral-500">
           {filtered.length} result{filtered.length === 1 ? '' : 's'}
-          {q ? ` for “${q}”` : ''}
+          {q ? ` for “${q}”` : ''} {tag ? ` in #${tag}` : ''}
         </p>
       </div>
 
+      {/* Tag chips */}
+      {allTags.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button
+            className={`${tagBtn} ${tag === null ? 'bg-black/5 dark:bg-white/10' : ''}`}
+            onClick={() => {
+              setTag(null);
+              setPage(1);
+            }}
+          >
+            All
+          </button>
+          {allTags.map((t) => (
+            <button
+              key={t}
+              className={`${tagBtn} ${tag === t ? 'bg-black/5 dark:bg-white/10' : ''}`}
+              onClick={() => {
+                setTag(tag === t ? null : t);
+                setPage(1);
+              }}
+              aria-pressed={tag === t}
+            >
+              #{t}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Results */}
       {pageItems.length === 0 ? (
         <p className="text-sm text-neutral-500">No matching posts.</p>
       ) : (
@@ -84,6 +130,7 @@ export default function BlogSearch({
         </ul>
       )}
 
+      {/* pager */}
       <div className="mt-8 flex items-center justify-between">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
