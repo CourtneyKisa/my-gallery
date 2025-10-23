@@ -3,6 +3,7 @@ import { getAllSlugs, getPostBySlug } from '../../../lib/posts';
 import { getSiteUrl } from '../../../lib/site';
 import { resolveOgImage } from '../../../lib/og';
 import { remark } from 'remark';
+import gfm from 'remark-gfm';
 import html from 'remark-html';
 
 export const revalidate = 60;
@@ -11,7 +12,6 @@ export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
 
-// Next 16: params is a Promise
 type ParamsP = Promise<{ slug: string }>;
 type Props = { params: ParamsP };
 
@@ -21,8 +21,7 @@ export async function generateMetadata({ params }: Props) {
   if (!post) return {};
   const site = getSiteUrl();
   const url = `${site}/blog/${encodeURIComponent(slug)}`;
-  const og = resolveOgImage(slug, post); // <-- pick best image
-
+  const og = resolveOgImage(slug, post);
   return {
     title: post.title,
     description: post.excerpt || undefined,
@@ -49,10 +48,15 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) return notFound();
 
-  const processed = await remark().use(html).process(post.content);
-  const contentHtml = processed.toString();
-  const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(post.date));
+  const contentWithResolvedImages = post.content.replace(
+    /(\]\()\.\/(?!\/)/g,
+    `$1/blog/${slug}/`
+  );
 
+  const processed = await remark().use(gfm).use(html).process(contentWithResolvedImages);
+  const contentHtml = processed.toString();
+
+  const date = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(post.date));
   const site = getSiteUrl();
   const url = `${site}/blog/${encodeURIComponent(slug)}`;
   const jsonLd = {
