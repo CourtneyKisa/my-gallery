@@ -5,6 +5,7 @@ import { resolveOgImage } from '../../../lib/og';
 import { remark } from 'remark';
 import gfm from 'remark-gfm';
 import html from 'remark-html';
+import LightboxImages from '../../../components/Lightbox';
 
 export const revalidate = 60;
 
@@ -12,6 +13,7 @@ export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
 
+// Next 16: params is a Promise
 type ParamsP = Promise<{ slug: string }>;
 type Props = { params: ParamsP };
 
@@ -48,6 +50,7 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) return notFound();
 
+  // Rewrite relative markdown image paths like ./pic.jpg -> /blog/<slug>/pic.jpg
   const contentWithResolvedImages = post.content.replace(
     /(\]\()\.\/(?!\/)/g,
     `$1/blog/${slug}/`
@@ -78,6 +81,9 @@ export default async function BlogPostPage({ params }: Props) {
         <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </article>
+
+      {/* Enable click-to-zoom on any image inside the article */}
+      <LightboxImages selector="article img" />
     </main>
   );
 }
