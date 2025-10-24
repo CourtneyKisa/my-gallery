@@ -1,3 +1,4 @@
+export const dynamic = "force-static";
 import PortfolioFilters from '@/components/PortfolioFilters';
 import Link from 'next/link';
 import Image from 'next/image';

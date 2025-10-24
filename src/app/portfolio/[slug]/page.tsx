@@ -1,3 +1,4 @@
+export const dynamic = "force-static";
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import GalleryLightbox from '@/components/GalleryLightbox';
