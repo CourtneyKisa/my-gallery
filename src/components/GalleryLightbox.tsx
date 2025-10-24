@@ -3,11 +3,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 
+type LightboxImage = string | {
+  src: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+};
+
+type Props = {
+  images: LightboxImage[];
+  thumbClassName?: string;
+  gridClassName?: string;
+};
+
 export default function GalleryLightbox({
   images,
   thumbClassName = 'aspect-square w-full rounded-xl object-cover',
   gridClassName = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3',
-}) {
+}: Props) {
+  // normalize input: string[] or { src, alt?, width?, height? }[]
   const list = useMemo(() => {
     return (images || []).map((it) =>
       typeof it === 'string' ? { src: it, alt: '' } : { alt: '', ...it }
@@ -16,9 +30,9 @@ export default function GalleryLightbox({
 
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
-  const dialogRef = useRef(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  const show = useCallback((i) => {
+  const show = useCallback((i: number) => {
     setIdx(i);
     setOpen(true);
     const el = dialogRef.current;
@@ -40,7 +54,7 @@ export default function GalleryLightbox({
   }, [list.length]);
 
   useEffect(() => {
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (!open) return;
       if (e.key === 'Escape') hide();
       if (e.key === 'ArrowLeft') prev();
@@ -95,7 +109,6 @@ export default function GalleryLightbox({
                 type="button"
                 onClick={hide}
                 className="rounded-lg bg-black/60 px-3 py-1 text-white backdrop-blur hover:bg-black/70"
-                aria-label="Close"
               >
                 ✕
               </button>
