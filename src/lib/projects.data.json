@@ -32,5 +32,20 @@
       "/images/shoot-001/1.png",
       "/og-image.png"
     ]
+  },
+  {
+    "slug": "portfolio-001",
+    "title": "Lookbook — Portfolio 001",
+    "excerpt": "Studio selects and edits.",
+    "cover": "/images/portfolio-001/cover.png",
+    "tags": [
+      "lookbook",
+      "studio"
+    ],
+    "description": "Replace images with your real content in public/images/portfolio-001.",
+    "images": [
+      "/images/portfolio-001/1.png",
+      "/og-image.png"
+    ]
   }
 ]
