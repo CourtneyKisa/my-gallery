@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-gallery-nine-puce.vercel.app';
   return {
     rules: [{ userAgent: '*', allow: '/' }],
-    sitemap: `${site}/sitemap.xml`,
+    sitemap: `${base}/sitemap.xml`
   };
 }
-

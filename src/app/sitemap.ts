@@ -1,28 +1,22 @@
 import type { MetadataRoute } from 'next';
-import { getAllPostsMeta } from '../lib/posts';
+import { getAllProjects } from '@/lib/projects';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
-  const nowISO = new Date().toISOString();
-
-  const posts = getAllPostsMeta(false);
-
-  const urls: MetadataRoute.Sitemap = [
-    { url: `${site}/`, lastModified: nowISO, changeFrequency: 'weekly', priority: 1 },
-    { url: `${site}/photos`, lastModified: nowISO, changeFrequency: 'monthly' },
-    { url: `${site}/videos`, lastModified: nowISO, changeFrequency: 'monthly' },
-    { url: `${site}/blog`, lastModified: posts[0]?.date || nowISO, changeFrequency: 'weekly' },
-    { url: `${site}/portfolio`, lastModified: nowISO, changeFrequency: 'monthly' },
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-gallery-nine-puce.vercel.app';
+  const projects = await getAllProjects();
+  const pages: MetadataRoute.Sitemap = [
+    { url: `${base}/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
+    { url: `${base}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${base}/portfolio`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${base}/about`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.4 }
   ];
-
-  for (const p of posts) {
-    urls.push({
-      url: `${site}/blog/${encodeURIComponent(p.slug)}`,
-      lastModified: new Date(p.date).toISOString(),
+  for (const p of projects) {
+    pages.push({
+      url: `${base}/portfolio/${p.slug}`,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
+      priority: 0.7
     });
   }
-
-  return urls;
+  return pages;
 }
-
