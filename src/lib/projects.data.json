@@ -47,5 +47,23 @@
       "/images/portfolio-001/1.png",
       "/og-image.png"
     ]
+  },
+  {
+    "slug": "studio-shoot-002",
+    "title": "MY FIRST BUILD",
+    "excerpt": "",
+    "cover": "/images/studio-shoot-002/cover.png",
+    "tags": [
+      "fashion",
+      "studio",
+      "gallery",
+      "lifestyle"
+    ],
+    "description": "",
+    "images": [
+      "/images/studio-shoot-002/1.jpg",
+      "/images/studio-shoot-002/2.jpg",
+      "/images/studio-shoot-002/3.jpg"
+    ]
   }
 ]
