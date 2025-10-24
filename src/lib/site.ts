@@ -6,12 +6,6 @@ export const getSiteUrl = (): string => {
   return 'http://localhost:3000';
 };
 
-export const getSiteName = (): string =>
-  process.env.NEXT_PUBLIC_SITE_NAME || 'Courtney Kisa';
-
-export const getTagline = (): string =>
-  process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Portfolio & Blog';
-
 export const getInstagramUrl = (): string => {
   const u = process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME || '';
   return u ? `https://instagram.com/${u}` : 'https://instagram.com';

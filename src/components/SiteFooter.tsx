@@ -1,5 +1,5 @@
-import { getInstagramUrl } from '@/lib/site';
-import { InstagramIcon } from '@/components/Icons';
+import { getInstagramUrl } from '../lib/site';
+import { InstagramIcon } from './Icons';
 
 export default function SiteFooter() {
   const ig = getInstagramUrl();

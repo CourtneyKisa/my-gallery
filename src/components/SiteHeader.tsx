@@ -1,7 +1,7 @@
-import ActiveLink from '@/components/ActiveLink';
+import ActiveLink from './ActiveLink';
 import Link from 'next/link';
-import { InstagramIcon } from '@/components/Icons';
-import { getInstagramUrl } from '@/lib/site';
+import { InstagramIcon } from './Icons';
+import { getInstagramUrl } from '../lib/site';
 
 export default function SiteHeader() {
   const ig = getInstagramUrl();
