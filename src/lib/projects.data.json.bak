@@ -49,10 +49,10 @@
     ]
   },
   {
-    "slug": "studio-shoot-002",
+    "slug": "studio-shoot-003",
     "title": "MY FIRST BUILD",
     "excerpt": "",
-    "cover": "/images/studio-shoot-002/cover.png",
+    "cover": "/images/studio-shoot-003/cover.png",
     "tags": [
       "fashion",
       "studio",
@@ -61,9 +61,9 @@
     ],
     "description": "",
     "images": [
-      "/images/studio-shoot-002/1.jpg",
-      "/images/studio-shoot-002/2.jpg",
-      "/images/studio-shoot-002/3.jpg"
+      "/images/studio-shoot-003/1.jpg",
+      "/images/studio-shoot-003/2.jpg",
+      "/images/studio-shoot-003/3.jpg"
     ]
   },
   {

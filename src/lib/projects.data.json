@@ -65,21 +65,5 @@
       "/images/studio-shoot-003/2.jpg",
       "/images/studio-shoot-003/3.jpg"
     ]
-  },
-  {
-    "slug": "brand-collab-denim",
-    "title": "Ideas",
-    "excerpt": "",
-    "cover": "/images/brand-collab-denim/cover.png",
-    "tags": [
-      "food",
-      "art",
-      "nature",
-      "passion"
-    ],
-    "description": "",
-    "images": [
-      "/images/brand-collab-denim/1.png"
-    ]
   }
 ]
