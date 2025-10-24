@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Still supported in Next 16 (optional)
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+
+  // Keep if you plan to load external images
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -9,4 +11,5 @@ const nextConfig = {
     ]
   }
 };
+
 module.exports = nextConfig;
